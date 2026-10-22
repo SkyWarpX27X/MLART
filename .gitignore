@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+
+# raw scrape (322 MB, regenerate with scraper/scan_sales.py) and logs
+data/raw/
+data/*.log
+data/*.err
