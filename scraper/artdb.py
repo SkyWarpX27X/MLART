@@ -44,8 +44,11 @@ LOT_DTYPE = np.dtype([
     ("n_lit", "u1"),           # 49  literature refs      (255 = not fetched yet)
     ("img_stats", "u1", (4,)), # 50  lightness, colourfulness, contrast, edge density (0 = not computed)
     ("subject", "u1"),         # 54  subject class (0 = not computed)
-    ("reserved", "u1", (9,)),  # 55  room for future image tokens / features
+    ("img_extra", "u1", (4,)), # 55  saturation, warmth, entropy, near-white share (0 = not computed)
+    ("reserved", "u1", (5,)),  # 59  room for future image tokens / features
 ])
+IMG_STATS = ["lightness", "colourfulness", "contrast", "edges"]
+IMG_EXTRA = ["saturation", "warmth", "entropy", "white"]
 assert LOT_DTYPE.itemsize == 64
 
 SALE_DTYPE = np.dtype([
@@ -80,7 +83,7 @@ FLAGS = {
     "category": (0, 3), "medium": (3, 5), "support": (8, 4), "attribution": (12, 3),
     "sold": (15, 1), "withdrawn": (16, 1), "signed": (17, 1), "dated": (18, 1),
     "inscribed": (19, 1), "stamped": (20, 1), "circa": (21, 1), "round": (22, 1),
-    "has_image": (23, 1), "price_clamped": (24, 1),
+    "has_image": (23, 1), "price_clamped": (24, 1), "img_features": (25, 1),
 }
 
 LOT_TEXT_COLS = ["artist_line", "title", "description", "image"]

@@ -6,3 +6,4 @@ __pycache__/
 data/raw/
 data/*.log
 data/*.err
+data/images/*.log

@@ -28,9 +28,13 @@ db.image_url(123)       # image link, rebuilt from a short stored key
 | `artists.bin`, `artists_text.*` | birth/death year, nationality, lot count, name |
 | `schema.json` | enums, dictionaries and flag bit layout |
 
-Record layouts are defined in `scraper/artdb.py`. Image fields (`phash`, `palette`,
-`img_stats`, `subject`, `reserved`) are zero, waiting for image tokenization;
-`n_prov/n_exh/n_lit` are 255 (not scraped yet).
+Record layouts are defined in `scraper/artdb.py`. `n_prov/n_exh/n_lit` are 255 (not scraped yet).
+
+**Image features** exist for 34,018 lots (USD paintings sold since 2010; `db.flag("img_features") == 1`):
+`img_stats` = lightness, colourfulness, contrast, edge density; `img_extra` = saturation, warmth,
+entropy, near-white share (all 0–255); `palette` = 3 dominant colours (RGB565); `phash` = 64-bit
+perceptual hash. Source of truth: `data/images/features.jsonl` (by object_id), merged on every build
+or with `python3 scraper/images.py merge`. Computed in-browser by `scraper/image_worker.js`.
 
 ### Caveats
 - **Prices** are price realised incl. buyer's premium, in the **original currency** (14, incl.

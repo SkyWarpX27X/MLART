@@ -15,6 +15,7 @@ import numpy as np
 import artdb
 from artdb import ARTIST_DTYPE, LOT_DTYPE, NOT_FETCHED, SALE_DTYPE, pack_flags, to_day
 from parse import ATTRIBUTION, CATEGORY, MEDIUM, SUPPORT, parse_lot
+from images import merge_image_features
 
 ROOT = Path(__file__).resolve().parent.parent / "data"
 U4_MAX = 2**32 - 1
@@ -132,13 +133,14 @@ def main():
                          to_day(r["date"]), min(r["h_mm"], 0xFFFF), min(r["w_mm"], 0xFFFF),
                          min(r["d_mm"], 0xFFFF), r["year"] if -32768 < r["year"] < 32768 else 0,
                          min(r["lot_number"], 0xFFFF), (0, 0, 0), ord(r["lot_suffix"]) if r["lot_suffix"] else 0,
-                         NOT_FETCHED, NOT_FETCHED, NOT_FETCHED, (0, 0, 0, 0), 0, (0,) * 9))
+                         NOT_FETCHED, NOT_FETCHED, NOT_FETCHED, (0, 0, 0, 0), 0, (0, 0, 0, 0), (0,) * 5))
             key = artdb.image_key(r["image"], int(r["date"][:4]), room, sale_number, r["lot_number"],
                                   r["lot_suffix"])
             n_img_tpl += key.startswith("~")
             text_rows.append([r["artist_line"], r["title"], r["description"], key])
 
     lots = np.array(rows, LOT_DTYPE)
+    n_img = merge_image_features(lots)
     lots.tofile(out / "lots.bin")
     sale_arr.tofile(out / "sales.bin")
     artists.tofile(out / "artists.bin")
@@ -164,6 +166,7 @@ def main():
     sizes = {p.name: p.stat().st_size for p in sorted(out.iterdir())}
     n = len(lots)
     print(f"lots {n:,}  sales {len(sales):,}  artists {len(keys):,}  clamped prices {n_clamped}")
+    print(f"image features merged for {n_img:,} lots")
     print(f"image templated {n_img_tpl / max(1, sum((lots['flags'] >> 23) & 1)):.1%} of lots with images")
     for k, v in sizes.items():
         print(f"  {k:<18} {v / 1e6:9.2f} MB  ({v / max(n, 1):6.1f} B/lot)")
